@@ -13,6 +13,9 @@ before_install:
   - sudo apt-get update -y
   - sudo apt remove clang-*
   - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" # Install llvm
+  - sudo ln -s /usr/bin/clang-18 /usr/bin/clang
+  - export PATH=/usr/bin/:$PATH
+
 
 install:
   - sudo apt install gcc-aarch64-linux-gnu -y
