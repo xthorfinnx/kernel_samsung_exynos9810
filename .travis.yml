@@ -1,0 +1,10 @@
+language: generic # Dont want travis to set anything clang/gcc related
+
+os:
+  - linux
+
+before_install:
+  - sudo apt-get update -y 
+
+install:
+  - exit 1
