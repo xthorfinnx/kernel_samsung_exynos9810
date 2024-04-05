@@ -4,7 +4,10 @@ os: linux
 dist: jammy 
 
 before_install:
-  - sudo apt-get update -y 
+  - sudo apt-get update -y
+  - bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" # Install llvm
+  
+
 
 install:
   - exit 1
