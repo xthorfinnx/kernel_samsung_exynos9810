@@ -22,10 +22,13 @@ install:
   - sudo apt install gcc-arm-none-eabi
 
 script:
+  - export O=out
   - export ARCH=arm64 
   - export CC=clang
   - export LD=ld.lld
   - export LLVM=1
+  - export LLVM_IAS=1
+  - export CLANG_TRIPLE=aarch64-linux-gnu-
   - export CROSS_COMPILE=aarch64-linux-gnu-
   - export CROSS_COMPILE_ARM32="arm-none-eabi-"
 
