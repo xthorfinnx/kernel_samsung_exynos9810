@@ -11,6 +11,7 @@ env:
 
 before_install:
   - sudo apt-get update -y
+  - sudo apt remove clang-*
   - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" # Install llvm
 
 install:
