@@ -1,7 +1,7 @@
 language: generic # Dont want travis to set anything clang/gcc related
 
-os:
-  - linux
+os: linux
+dist: jammy 
 
 before_install:
   - sudo apt-get update -y 
