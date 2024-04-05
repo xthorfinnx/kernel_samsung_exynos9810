@@ -19,7 +19,7 @@ before_install:
 
 install:
   - sudo apt install gcc-aarch64-linux-gnu -y
-  - sudo apt install gcc-arm-linux-eabi
+  - sudo apt install gcc-arm-linux-gnueabi
 
 script:
   - export O=out
@@ -30,7 +30,7 @@ script:
   - export LLVM_IAS=1
   - export CLANG_TRIPLE=aarch64-linux-gnu-
   - export CROSS_COMPILE=aarch64-linux-gnu-
-  - export CROSS_COMPILE_ARM32="arm-linux-eabi-"
+  - export CROSS_COMPILE_ARM32="arm-linux-gnueabi-"
 
   - clang --version
 
