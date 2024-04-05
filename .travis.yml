@@ -13,6 +13,8 @@ before_install:
   - sudo apt-get update -y
   - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" # Install llvm
 
+install:
+  - sudo apt install gcc-aarch64-linux-gnu -y
 
 script:
   - export ARCH=arm64 
