@@ -3,11 +3,20 @@ language: generic # Dont want travis to set anything clang/gcc related
 os: linux
 dist: jammy 
 
+env:
+  - DEFCONFIG=exynos9810-crownlte_defconfig
+  - DEFCONFIG=exynos9810-starlte_defconfig
+  - DEFCONFIG=exynos9810-star2lte_defconfig
+
+
 before_install:
   - sudo apt-get update -y
   - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" # Install llvm
 
 
+script:
+  - export ARCH=arm 
+  - export CROSS_COMPILE=aarch64-linux-gnu-
 
-install:
-  - exit 1
+  - make "-j$(nproc)" $DEFCONFIG
+  - make "-j$(nproc)"
