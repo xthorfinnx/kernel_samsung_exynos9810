@@ -25,3 +25,6 @@ script:
 
   - make "-j$(nproc)" $DEFCONFIG
   - make "-j$(nproc)"
+
+cache:
+  apt: true
