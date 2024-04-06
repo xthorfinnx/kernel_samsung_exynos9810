@@ -12,6 +12,7 @@ env:
 before_install:
   - sudo apt-get update -y
   - sudo apt remove clang-*
+  - sudo rm -rf  /usr/local/clang-*
 
   # Install llvm 14
   - wget https://apt.llvm.org/llvm.sh
