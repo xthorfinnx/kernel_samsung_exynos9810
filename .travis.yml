@@ -19,6 +19,7 @@ before_install:
   - sudo ./llvm.sh 14 
   
   - sudo ln -s /usr/bin/clang-14 /usr/bin/clang
+  - sudo ln -s /usr/bin/ld.lld-14 /usr/bin/ld.lld
   - export PATH=/usr/bin/:$PATH
 
 
