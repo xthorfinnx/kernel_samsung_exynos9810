@@ -12,8 +12,13 @@ env:
 before_install:
   - sudo apt-get update -y
   - sudo apt remove clang-*
-  - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" # Install llvm
-  - sudo ln -s /usr/bin/clang-18 /usr/bin/clang
+
+  # Install llvm 14
+  - wget https://apt.llvm.org/llvm.sh
+  - chmod +x llvm.sh
+  - sudo ./llvm.sh 14 
+  
+  - sudo ln -s /usr/bin/clang-14 /usr/bin/clang
   - export PATH=/usr/bin/:$PATH
 
 
