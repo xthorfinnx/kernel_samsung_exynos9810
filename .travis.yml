@@ -10,6 +10,7 @@ env:
 
 
 before_install:
+  # Remove any old clang versions, which interfere
   - sudo apt-get update -y
   - sudo apt remove clang-*
   - sudo rm -rf  /usr/local/clang-*
@@ -19,6 +20,7 @@ before_install:
   - chmod +x llvm.sh
   - sudo ./llvm.sh 14 
   
+  # Link llvm 14 to the defaults
   - sudo ln -s /usr/bin/clang-14 /usr/bin/clang
   - sudo ln -s /usr/bin/ld.lld-14 /usr/bin/ld.lld
   - export PATH=/usr/bin/:$PATH
@@ -29,7 +31,7 @@ install:
   - sudo apt install gcc-arm-linux-gnueabi
 
 script:
-  - export O=out
+  - export O=kernel_out
   - export ARCH=arm64 
   - export CC=clang
   - export LD=ld.lld
@@ -43,6 +45,18 @@ script:
 
   - make "-j$(nproc)" $DEFCONFIG
   - make "-j$(nproc)"
+
+after_script:
+  - mkdir out/
+  - tar czf out/kernel_out.tar.gz kernel_out/
+
+deploy:
+  provider: releases
+  api_key:
+    secure: MPT+Rk598MbRkumIAnEK2RxcJRNVXtaKVOVSSgIXwetHhJyp+zGa9Yv0OEIrxRuSlikMsLd7hCW7iHrdXfOlb1+Tmg8611/itEXKFcYK1vOQ0jvdLmKdzEHFkZDDaGexloBfiborm51R1GAlE0e0uO3EvSwsKhvEFt7Xqzesw7AYQ/9gUVlIhIC3pRuvu+5ah6PIC1OxeXReJN3mbl3jKXsd+GS5413m4uXRKdM85Bp73QguM83OfvCLr34+mKv6sTc9Z/ibnhq9vunVH7rcfFG/YktnbIHKZaMyO8wECGgBc5nGPayScN0VHFvL1W4ZrvgjVgtkrFCdSSGRSeBmrj8YvOFdRYETPOCTeNmAfMydOBP+lW7OEjikbV8wVrAVEoBu12MpomnSP2gaYr6uEReGi4Z3a+w6WKoU0RQYDad3C61Pq0vPpU9q4N42YA4Lw1vbxi3DuMmD9nYu2G5rerfMPiyNYBtmWTzHpxo0EDIRlpbE9vuHPoovNqAN3YRcBWDoyxhgnVKeqSfZtm5OPBLlt8qJyOCbsv4VcuJ1Hu+uJu4k29MNuIuBklv5y+Ls7zu6QmdPZr9V5ak/pqxVvPzMQoDFRK6uI3mdxi3mkcpggz7a00zzgvoJl1R90lss8xpm5/rbGdMtd1boiecWcjuZyvKJQa7r3kajKuywH8M=
+  file: 
+    - out/kernel_out.tar.gz
+  skip_cleanup: 'true'
 
 cache:
   apt: true
