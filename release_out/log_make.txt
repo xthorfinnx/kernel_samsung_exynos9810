@@ -1,0 +1,12 @@
+make[1]: Entering directory '/home/eshark/kernel_samsung_exynos9810-V2/out'
+  CHK     include/config/kernel.release
+  GEN     ./Makefile
+  CHK     include/generated/uapi/linux/version.h
+  CHK     include/generated/utsrelease.h
+  Using .. as source for kernel
+  .. is not clean, please run 'make mrproper'
+  in the '..' directory.
+make[1]: *** [/home/eshark/kernel_samsung_exynos9810-V2/Makefile:1219: prepare3] Error 1
+make[1]: *** Waiting for unfinished jobs....
+make[1]: Leaving directory '/home/eshark/kernel_samsung_exynos9810-V2/out'
+make: *** [Makefile:152: sub-make] Error 2
