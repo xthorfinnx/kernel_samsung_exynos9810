@@ -31,7 +31,6 @@ install:
   - sudo apt install gcc-arm-linux-gnueabi
 
 script:
-  - export O=out
   - export ARCH=arm64 
   - export CC=clang
   - export LD=ld.lld
@@ -64,7 +63,6 @@ deploy:
   file: 
     - out/kernel_out.tar.gz
   skip_cleanup: 'true'
-
 cache:
   apt: true
 
