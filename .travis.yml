@@ -48,7 +48,7 @@ script:
   - make O=out "-j$(nproc)" $DEFCONFIG  2>&1 | tee release_out/log_make.txt
   - make O=out "-j$(nproc)" 2>&1 | tee release_out/log_make.txt
 
-after_script:
+after_success:
   - tar czf release_out/kernel_out.tar.gz out/
 
 before_deploy:
