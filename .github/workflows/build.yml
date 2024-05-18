@@ -1,0 +1,115 @@
+name: Kernel Build
+run-name: Kernel Build caused by ${{github.event_name}} - ${{github.actor}}
+
+on: [push, workflow_dispatch, workflow_call]
+
+jobs:
+  KernelBuild:
+    runs-on: [self-hosted, linux, x64]
+
+    strategy:
+      matrix:
+        DEVICE: [crownlte, starlte]
+        ROOT: [kernelsu]
+
+        include:
+          - DEVICE: crownlte
+            DEFCONFIG: exynos9810-crownlte_defconfig
+
+          - DEVICE: starlte
+            DEFCONFIG: exynos9810-starlte_defconfig
+
+          # - DEVICE: star2lte  
+          #   DEFCONFIG: exynos9810-star2lte_defconfig
+
+    env:
+      DEFCONFIG: ${{ matrix.DEFCONFIG }}
+      DEVICE:    ${{ matrix.DEVICE    }}
+      ROOT:      ${{ matrix.ROOT      }}
+
+    steps:
+      - name: Install clang 14
+        run: |
+          # Install our clang version
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 14
+          sudo apt install -y llvm-14 clang-14 bc
+
+          # Link llvm 14 to the defaults
+          for f in /usr/bin/*-14
+            do sudo ln -sf "$f" "${f::-3}"
+          done
+
+          export PATH=/usr/bin/:$PATH
+
+      - name: Install gcc dependencies
+        run: sudo apt install -y gcc-arm-linux-gnueabi gcc-aarch64-linux-gnu
+
+      - name: Check out kernel source
+        uses: actions/checkout@v4
+
+      - name: Add kernelsu support to kernel
+        if: env.ROOT  == 'kernelsu'
+        run: curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash - 
+
+      - name: Build kernel
+        run: |
+          mkdir release_out
+
+          make ARCH=arm64 CC=clang LD=ld.lld LLVM=1 LLVM_IAS=1 CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32="arm-linux-gnueabi-" O=out "-j$(nproc)" $DEFCONFIG  2>&1 | tee release_out/log_makedef.txt
+          make ARCH=arm64 CC=clang LD=ld.lld LLVM=1 LLVM_IAS=1 CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32="arm-linux-gnueabi-" O=out "-j$(nproc)"             2>&1 | tee release_out/log_make.txt
+
+      - name: Compress build artifacts
+        run: tar -cvf release_out/kernel.tar.gz out/
+
+      - name: Copy usefull artifacts (dtb.img, Image)
+        run: |
+          cp out/arch/arm64/boot/dtb.img release_out/dtb.img
+          cp out/arch/arm64/boot/Image   release_out/Image
+          cp out/arch/arm64/boot/Image.gz   release_out/Image.gz
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: ${{ env.DEVICE }}_root_${{ env.ROOT }}
+          path: release_out/
+
+  Package_AK3:
+    runs-on: [self-hosted, linux, x64]
+    needs: KernelBuild
+    if: ${{ success() }}
+
+    steps:
+      - name: Clone AK3 template
+        run: git clone https://github.com/ESHARK22/Exynos9810_AK3_Template
+
+      - name: Fetch kernel build archives
+        uses: actions/download-artifact@v4
+        with:
+          path: kernel_artifacts/
+
+      - name: Unpack kernel artifacts into ak3
+        run: |
+          for dir in kernel_artifacts/* ; do
+            dir_arr=(${dir//_/ })
+
+            device=${dir_arr[0]}
+            root=${dir_arr[2]}
+
+            echo $device-$root
+
+            cp $dir/dtb.img Exynos9810_AK3_Template/Dtb/$device/dtb.img
+            cp $dir/Image   Exynos9810_AK3_Template/Kernel/$device/zImage
+
+          done
+
+      - name: Package ak3
+        run: zip -r9 ${{github.ref}}_${{github.run_id}}.zip * -x .git README.md *placeholder
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          path: ${{github.ref}}_${{github.run_id}}.zip
